@@ -119,7 +119,44 @@ BAT_THEME="Catppuccin Mocha"
 
 # ---- Eza (better ls) -----
 
-alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions"
+#alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions"
 export PATH=$PATH:/home/sumit/.spicetify
+alias ls='eza -l --icons=always --header --group-directories-first'
+alias ls='eza --icons=always --group-directories-first'
+alias ll='eza -l --icons=always --header --group-directories-first'
+alias la='eza -la --icons=always --header --group-directories-first'
+alias lt='eza --tree --icons=always'
 
 alias lg="lazygit"
+
+. "$HOME/.local/share/../bin/env"
+
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:~/.spicetify
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/sumit/.lmstudio/bin"
+# End of LM Studio CLI section
+
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/sumit/.local/bin:$PATH"
+
+eval $(thefuck --alias)
+. "/home/sumit/.deno/env"
+alias md='mkdir -p'
+
+# tmuxp session shortcuts
+alias tgo="tmuxp load golang"
+alias tdsa="tmuxp load DSA"
+alias trn="tmuxp load react-native"
+alias tls="tmux ls"
+alias tkill="tmux kill-session -t"
+alias tgen="tmuxp load Genai"
