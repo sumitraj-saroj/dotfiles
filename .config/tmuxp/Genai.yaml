@@ -1,0 +1,22 @@
+session_name: GenAI # e.g. rn
+start_directory: ~/Github/learning-genai/python-basics/ # your React Native project path
+
+windows:
+  - window_name: editor
+    panes:
+      - shell_command:
+          - nvim . # nvim, full-screen — you did this exact thing in DSA
+
+  - window_name: terminal
+    panes:
+      - shell_command:
+          - ls # empty shell — you start it manually per-project
+  - window_name: opencode
+    panes:
+      - shell_command:
+          - opencode # opencode command
+
+  - window_name: git
+    panes:
+      - shell_command:
+          - lazygit # you already know this one
