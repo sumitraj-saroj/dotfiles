@@ -1,0 +1,30 @@
+session_name: golang
+start_directory: ~/Github/golang
+
+windows:
+  # Window 1: editor — nvim on top (70%), terminal below (30%)
+  - window_name: editor
+    layout: main-horizontal
+    options:
+      main-pane-height: 70%
+    panes:
+      - shell_command:
+          - nvim .
+      - shell_command:
+          - "" # free terminal pane, 30% height, for go build/run/test etc.
+
+  # Window 2: run — empty shell, you drive it manually
+  - window_name: run
+    panes:
+      - shell_command:
+          - ""
+  - window_name: opencode
+    panes:
+      - shell_command:
+          - opencode # opencode command
+
+  # Window 3: git — auto-launches lazygit
+  - window_name: git
+    panes:
+      - shell_command:
+          - lazygit
