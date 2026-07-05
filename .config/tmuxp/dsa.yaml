@@ -1,0 +1,26 @@
+session_name: DSA # pick a short name, e.g. dsa
+start_directory: ~/Github/Namaste-DSA/ # you already have this one
+
+windows:
+  - window_name: editor
+    panes:
+      - shell_command:
+          - nvim . # what opens nvim?
+
+  - window_name: terminal
+    panes:
+      - shell_command:
+          - ls # empty string, or a command?
+  - window_name: opencode
+    panes:
+      - shell_command:
+          - opencode # opencode command
+
+  - window_name: notes
+    panes:
+      - shell_command:
+          - glow README.md # the glow command
+  - window_name: git
+    panes:
+      - shell_command:
+          - lazygit
