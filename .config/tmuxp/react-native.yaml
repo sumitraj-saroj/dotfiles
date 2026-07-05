@@ -1,0 +1,22 @@
+session_name: React-Native # e.g. rn
+start_directory: ~/Github/react-native-tutorial/ # your React Native project path
+
+windows:
+  - window_name: editor
+    panes:
+      - shell_command:
+          - nvim . # nvim, full-screen — you did this exact thing in DSA
+
+  - window_name: opencode
+    panes:
+      - shell_command:
+          - opencode # opencode command
+  - window_name: emulator-logs
+    panes:
+      - shell_command:
+          - "" # empty shell too
+
+  - window_name: git
+    panes:
+      - shell_command:
+          - lazygit # you already know this one
