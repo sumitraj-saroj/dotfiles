@@ -1,162 +1,165 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+ # ==========================================
+    # ⚡ 1. POWERLEVEL10K INSTANT PROMPT
+    # ==========================================
+    if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+      source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+    fi
 
+    # ==========================================
+    # 📦 2. PLUGIN MANAGER (ZINIT)
+    # ==========================================
+    ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+    if [ ! -d "$ZINIT_HOME" ]; then
+       mkdir -p "$(dirname $ZINIT_HOME)"
+       git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+    fi
+    source "${ZINIT_HOME}/zinit.zsh"
 
-# Set the directory we want to store zinit and plugins
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+    # Theme Configuration
+    zstyle ':catppuccin:p10k' 'theme' 'lean'
+    zstyle ':catppuccin:p10k' 'flavour' 'mocha'
+    zinit ice depth=1; zinit light romkatv/powerlevel10k
+    zinit light tolkonepiu/catppuccin-powerlevel10k-themes
 
-# Download Zinit, if it's not there yet
-if [ ! -d "$ZINIT_HOME" ]; then
-   mkdir -p "$(dirname $ZINIT_HOME)"
-   git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-fi
+    [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Source/Load zinit
-source "${ZINIT_HOME}/zinit.zsh"
+    # Zsh Plugins
+    zinit light zsh-users/zsh-syntax-highlighting
+    zinit light zsh-users/zsh-completions
+    zinit light zsh-users/zsh-autosuggestions
+    zinit light Aloxaf/fzf-tab
 
-# Add in Powerlevel10k
-zinit ice depth=1; zinit light romkatv/powerlevel10k
+    autoload -Uz compinit && compinit
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+    # Oh-My-Zsh Snippets
+    zinit snippet OMZL::git.zsh
+    zinit snippet OMZP::git
+    zinit snippet OMZP::sudo
+    zinit snippet OMZP::archlinux
+    zinit snippet OMZP::aws
+    zinit snippet OMZP::kubectl
+    zinit snippet OMZP::command-not-found
 
+    # ==========================================
+    # ⚙️ 3. SHELL HISTORY & KEYBINDINGS
+    # ==========================================
+    bindkey -e
+    bindkey '^p' history-search-backward
+    bindkey '^n' history-search-forward
+    bindkey '^[w' kill-region
 
-# Add in zsh plugins
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-zinit light Aloxaf/fzf-tab
+    HISTSIZE=5000
+    HISTFILE=~/.zsh_history
+    SAVEHIST=$HISTSIZE
+    setopt appendhistory
+    setopt sharehistory
+    setopt hist_ignore_space
+    setopt hist_ignore_all_dups
+    setopt hist_save_no_dups
+    setopt hist_ignore_dups
+    setopt hist_find_no_dups
 
+    # ==========================================
+    # 🎨 4. COMPLETION STYLING & FZF CANDIDATES
+    # ==========================================
+    zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+    zstyle ':completion:*' menu no
+    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
+    zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
+    export FZF_DEFAULT_COMMAND="fd --hidden --strip-cwd-prefix --exclude .git"
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_ALT_C_COMMAND="fd --type=d --hidden --strip-cwd-prefix --exclude .git"
 
-# Load completions
-autoload -Uz compinit && compinit
+    _fzf_compgen_path() { fd --hidden --exclude .git . "$1" }
+    _fzf_compgen_dir() { fd --type=d --hidden --exclude .git . "$1" }
 
+    # Bat (Better Cat Theme)
+    export BAT_THEME="Catppuccin Mocha"
 
-# Add in snippets
-zinit snippet OMZL::git.zsh
-zinit snippet OMZP::git
-zinit snippet OMZP::sudo
-zinit snippet OMZP::archlinux
-zinit snippet OMZP::aws
-zinit snippet OMZP::kubectl
-zinit snippet OMZP::kubectx
-zinit snippet OMZP::command-not-found
+    # ==========================================
+    # 🛠️ 5. PATH DEFINITIONS
+    # ==========================================
+    # Standard local binaries
+    export PATH="$HOME/.local/bin:$PATH"
 
+    # Go Binaries
+    export PATH="$HOME/go/bin:$PATH"
 
-# Keybindings
-bindkey -e
-bindkey '^p' history-search-backward
-bindkey '^n' history-search-forward
-bindkey '^[w' kill-region
+    # Spicetify Spotify modifier
+    export PATH="$PATH:$HOME/.spicetify"
 
-# History
-HISTSIZE=5000
-HISTFILE=~/.zsh_history
-SAVEHIST=$HISTSIZE
-HISTDUP=erase
-setopt appendhistory
-setopt sharehistory
-setopt hist_ignore_space
-setopt hist_ignore_all_dups
-setopt hist_save_no_dups
-setopt hist_ignore_dups
-setopt hist_find_no_dups
+    # LM Studio CLI (lms)
+    export PATH="$PATH:$HOME/.lmstudio/bin"
 
+    # Android SDK
+    export ANDROID_HOME="$HOME/Android/Sdk"
+    export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+    # Sourcing general environment scripts
+    [ -f "$HOME/.local/share/../bin/env" ] && . "$HOME/.local/share/../bin/env"
+    [ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 
+    # ==========================================
+    # ⚡ 6. LAZY-LOAD NODE / EXTRA RUNTIMES
+    # ==========================================
+    # Note: Since you use mise, you should manage Node via mise (e.g. `mise use -g node@20`)
+    # which has 0ms load speed. If you still need NVM, use this:
+    export NVM_DIR="$HOME/.config/nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
+    # ==========================================
+    # Integrations (FZF & Zoxide)
+    # ==========================================
+    eval "$(fzf --zsh)"
+    eval "$(zoxide init --cmd cd zsh)"
 
-# Completion styling
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-zstyle ':completion:*' menu no
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
+    # ==========================================
+    # 🐚 7. ALIASES (Cleaned and Deduplicated)
+    # ==========================================
+    alias vim='nvim'
+    alias c='clear'
+    alias md='mkdir -p'
+    alias lg="lazygit"
 
-# Aliases
-alias ls='ls --color'
-alias vim='nvim'
-alias c='clear'
+    # Eza (Modern LS replacements)
+    alias ls='eza --icons=always --group-directories-first'
+    alias ll='eza -l --icons=always --header --group-directories-first'
+    alias la='eza -la --icons=always --header --group-directories-first'
+    alias lt='eza --tree --icons=always'
 
+    # tmuxp session shortcuts
+    alias tgo="tmuxp load golang"
+    alias tdsa="tmuxp load DSA"
+    alias trn="tmuxp load react-native"
+    alias tls="tmux ls"
+    alias tkill="tmux kill-session -t"
+    alias tgen="tmuxp load Genai"
 
+    # Hardcoded "thefuck" command (Saves ~150ms startup delay)
+    fuck () {
+        TF_LIMIT_DESC=9999
+        local fuck_command=$(THEFUCK_REQUIRE_CONFIRMATION=true thefuck $(fc -ln -1))
+        if [ -n "$fuck_command" ]; then
+            eval "$fuck_command"
+            print -s "$fuck_command"
+        fi
+    }
 
+    # ==========================================
+    # 🧠 8. SECOND BRAIN ALIASES
+    # ==========================================
+    alias b='brain'
+    alias bj='brain journal'
+    alias bcap='brain capture'
+    alias bs='brain search'
+    alias bp='brain process-inbox'
+    alias btd='brain todo daily'
+    alias btw='brain todo weekly'
+    alias btm='brain todo monthly'
+    alias btg='brain tag'
+    alias blk='brain link'
+    alias brd='brain review daily'
+    alias brw='brain review weekly'
 
-# Shell integrations
-eval "$(fzf --zsh)"
-
-eval "$(zoxide init --cmd cd zsh)"
-
-# -- Use fd instead of fzf --
-
-export FZF_DEFAULT_COMMAND="fd --hidden --strip-cwd-prefix --exclude .git"
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND="fd --type=d --hidden --strip-cwd-prefix --exclude .git"
-
-# Use fd (https://github.com/sharkdp/fd) for listing path candidates.
-# - The first argument to the function ($1) is the base path to start traversal
-# - See the source code (completion.{bash,zsh}) for the details.
-_fzf_compgen_path() {
-  fd --hidden --exclude .git . "$1"
-}
-
-# Use fd to generate the list for directory completion
-_fzf_compgen_dir() {
-  fd --type=d --hidden --exclude .git . "$1"
-}
-
-# ----- Bat (better cat) -----
-
-#export BAT_THEME=tokyonight_night
-
-BAT_THEME="Catppuccin Mocha"
-
-# ---- Eza (better ls) -----
-
-#alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions"
-export PATH=$PATH:/home/sumit/.spicetify
-alias ls='eza -l --icons=always --header --group-directories-first'
-alias ls='eza --icons=always --group-directories-first'
-alias ll='eza -l --icons=always --header --group-directories-first'
-alias la='eza -la --icons=always --header --group-directories-first'
-alias lt='eza --tree --icons=always'
-
-alias lg="lazygit"
-
-. "$HOME/.local/share/../bin/env"
-
-export NVM_DIR="$HOME/.config/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-export ANDROID_HOME=$HOME/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/emulator
-export PATH=$PATH:$ANDROID_HOME/platform-tools
-export PATH=$PATH:~/.spicetify
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/home/sumit/.lmstudio/bin"
-# End of LM Studio CLI section
-
-
-
-# Added by Antigravity CLI installer
-export PATH="/home/sumit/.local/bin:$PATH"
-
-eval $(thefuck --alias)
-. "/home/sumit/.deno/env"
-alias md='mkdir -p'
-
-# tmuxp session shortcuts
-alias tgo="tmuxp load golang"
-alias tdsa="tmuxp load DSA"
-alias trn="tmuxp load react-native"
-alias tls="tmux ls"
-alias tkill="tmux kill-session -t"
-alias tgen="tmuxp load Genai"
