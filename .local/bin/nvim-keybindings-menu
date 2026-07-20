@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Display Neovim/LazyVim keybindings using walker for an interactive search menu.
+# Reads from the curated cheatsheet Lua data file and formats entries
+# in the same style as Omarchy's keybindings menu.
+
+CHEATSHEET="$HOME/.config/nvim/lua/config/keybindings-cheatsheet.lua"
+
+if [[ ! -f "$CHEATSHEET" ]]; then
+  echo "Cheatsheet not found: $CHEATSHEET" >&2
+  exit 1
+fi
+
+# Parse the Lua table and format each entry as:
+# [Normal] [Navigation]   gg                         → Go to first line
+parse_cheatsheet() {
+  awk '
+  /mode\s*=/ {
+    mode = ""; category = ""; keys = ""; desc = ""
+
+    # Extract mode
+    if (match($0, /mode\s*=\s*"([^"]+)"/, m)) mode = m[1]
+
+    # Look at current and subsequent lines for all fields
+    line = $0
+    # If all fields are on one line, parse them
+    if (match(line, /category\s*=\s*"([^"]+)"/, m)) category = m[1]
+    if (match(line, /keys\s*=\s*"([^"]+)"/, m)) keys = m[1]
+    if (match(line, /desc\s*=\s*"([^"]+)"/, m)) desc = m[1]
+
+    if (mode != "" && category != "" && keys != "" && desc != "") {
+      printf "%-10s %-16s %-18s → %s\n", mode, category, keys, desc
+    }
+  }
+  ' "$CHEATSHEET"
+}
+
+if [[ $1 == "--print" || $1 == "-p" ]]; then
+  parse_cheatsheet
+else
+  monitor_height=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .height')
+  menu_height=$((monitor_height * 45 / 100))
+
+  parse_cheatsheet |
+    walker --dmenu -p 'Neovim Keybindings' --width 1100 --height "$menu_height"
+fi
