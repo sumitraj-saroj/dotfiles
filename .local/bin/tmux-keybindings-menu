@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Display tmux keybindings using walker for an interactive search menu.
+# Reads from the curated cheatsheet text file.
+# Same UX as Omarchy's SUPER+K and the Neovim keybindings menu.
+
+CHEATSHEET="$HOME/.config/tmux/keybindings-cheatsheet.txt"
+
+if [[ ! -f "$CHEATSHEET" ]]; then
+  echo "Cheatsheet not found: $CHEATSHEET" >&2
+  exit 1
+fi
+
+# Parse the cheatsheet, skip comments and blank lines, format nicely
+parse_cheatsheet() {
+  grep -E '^\w' "$CHEATSHEET" |
+    sed 's/ → /|/' |
+    awk -F '|' '{
+      # Left side has: TYPE  CATEGORY  KEYS
+      n = split($1, parts, /[ \t]+/)
+      if (n < 3) next
+
+      type = parts[1]
+      category = parts[2]
+
+      keys = ""
+      for (i = 3; i <= n; i++) {
+        keys = keys (i > 3 ? " " : "") parts[i]
+      }
+
+      desc = $2
+      gsub(/^[ \t]+|[ \t]+$/, "", desc)
+
+      printf "%-10s %-10s %-24s → %s\n", type, category, keys, desc
+    }'
+}
+
+if [[ $1 == "--print" || $1 == "-p" ]]; then
+  parse_cheatsheet
+else
+  monitor_height=$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .height')
+  menu_height=$((monitor_height * 45 / 100))
+
+  parse_cheatsheet |
+    walker --dmenu -p 'Tmux Keybindings (Prefix = Ctrl+Space)' --width 1100 --height "$menu_height"
+fi
